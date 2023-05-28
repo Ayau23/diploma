@@ -7,7 +7,7 @@ import { ReactElement } from 'react'
 import useWebSocket from 'react-use-websocket'
 
 const Main = () => {
-  const WS_URL = 'ws://drongo.pythonanywhere.com/ws/chat/1/'
+  const WS_URL = 'ws://167.99.140.74/ws/chat/'
 
   useWebSocket(WS_URL, {
     onOpen: () => {

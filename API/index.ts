@@ -1,13 +1,12 @@
 import axios from 'axios'
 
-const URL = process.env.NEXT_PUBLIC_API_URL
+const URL = 'http://167.99.140.74/'
 const $host = axios.create({
   baseURL: URL,
 })
 
 const $authHost = axios.create({
   baseURL: URL,
-  withCredentials: true,
 })
 
 const authInterceptor = async (config: any) => {

@@ -7,12 +7,10 @@ import { Search } from '@/modules/Search'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'next-i18next'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 
 const Main = () => {
   const { t } = useTranslation()
-  const { locale } = useRouter()
 
   const {
     data: vacancies,

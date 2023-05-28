@@ -6,13 +6,11 @@ import { Layout } from '@/modules/Layout'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'next-i18next'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import { useFavouritesStore } from 'store/favourites'
 
 const Main = () => {
   const { t } = useTranslation()
-  const { locale } = useRouter()
   const { favourites } = useFavouritesStore()
 
   const {
