@@ -1,4 +1,4 @@
-import { getVacancies } from '@/API/vacancy.service'
+import { searchVacancies } from '@/API/vacancy.service'
 import { Wrapper } from '@/components/Layout/Wrapper'
 import { Container } from '@/components/UI/Container'
 import { Cards } from '@/modules/Cards'
@@ -12,13 +12,10 @@ import { ReactElement } from 'react'
 
 const Main = () => {
   const { t } = useTranslation()
-  const { locale } = useRouter()
-
-  const {
-    data: vacancies,
-    isLoading,
-    isError,
-  } = useQuery(['vacancies'], () => getVacancies())
+  const { query } = useRouter()
+  const { data, isLoading, isError } = useQuery(['tours', query.text], () =>
+    searchVacancies(String(query?.text ?? '')),
+  )
 
   if (isLoading) return <>Loading...</>
   if (isError) return <>Error!</>
@@ -26,12 +23,18 @@ const Main = () => {
   return (
     <>
       <Head>
-        <title>GoIntern | Main</title>
+        <title>{`${query.text} | GoIntern`}</title>
       </Head>
       <Wrapper>
-        <Container className='pt-10 pb-24 mx-auto xs:pt-0'>
+        <Container className='pt-10 pb-24 flex flex-col mx-auto xs:pt-0'>
           <Search />
-          <Cards title={t('Vacancies')} vacancies={vacancies} />
+          {data.length ? (
+            <Cards title={t('Found vacancies')} vacancies={data} />
+          ) : (
+            <span className=' font-medium inline-block mt-8 ml-2'>
+              No vacancies was found
+            </span>
+          )}
         </Container>
       </Wrapper>
     </>

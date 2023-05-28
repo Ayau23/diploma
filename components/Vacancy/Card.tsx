@@ -1,49 +1,54 @@
 import { components } from '@/API/types/api.types'
+import { mdiCardsHeart } from '@mdi/js'
+import Icon from '@mdi/react'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { ComponentPropsWithoutRef } from 'react'
 import { useFavouritesStore } from 'store/favourites'
-import { usePreferencesStore } from 'store/preferences'
+import NoSSR from '../Common/NoSSR'
 
 interface Props extends ComponentPropsWithoutRef<'div'> {
-	vacancy: components['schemas']['Vacancy']
+  vacancy: components['schemas']['Vacancy']
 }
 
 export const Card = ({ vacancy, className }: Props) => {
-	const { currency } = usePreferencesStore(state => state)
-	const { favourites, addFavourite, removeFavourite } = useFavouritesStore(
-		state => state,
-	)
-	// const isTourInFavourite = favourites.find(favourite => favourite === vacancy.id)
-	// const addToFavourites = () => {
-	// isTourInFavourite ? removeFavourite(vacancy.id) : addFavourite(vacancy.id)
-	// }
+  const { favourites, addFavourite, removeFavourite } = useFavouritesStore()
 
-	// TODO: Настроить отображение рейтинга
+  const isFavourite = favourites.find(_vacancy => _vacancy === vacancy.id)
 
-	return (
-		<div
-			className={clsx(
-				' border-lightGray border rounded-lg relative basis-[calc(50%_-_16px)] flex flex-col xs:max-w-none lg:basis-52 xs:basis-10/12 xs:mb-5',
-				className,
-			)}
-		>
-			{/* <span className='top-3 absolute left-3 rounded-lg bg-yellow py-1 px-3 font-bold'> */}
-			{/* <NoSSR>
-					{vacancy.price && data?.price
-						? `${currency.symbol} ${data.price * vacancy.price ?? 0}`
-						: `${currency.symbol} ${vacancy.price}`}
-				</NoSSR> */}
-			{/* </span> */}
-			<div className='w-full px-3 py-3 rounded-lg border-t-0'>
-				<Link href={`/vacancy/${vacancy.id}`}>
-					<p className='font-semibold text-sm mb-1'>{vacancy.name}</p>
-				</Link>
-				<span className='text-gray font-normal mb-2 inline-block'>
-					{vacancy.salary_min} тг. - {vacancy.salary_max} тг.
-				</span>
-				<div className='flex flex-row items-center'></div>
-			</div>
-		</div>
-	)
+  const addToFavourites = () => {
+    isFavourite ? removeFavourite(vacancy.id) : addFavourite(vacancy.id)
+  }
+
+  return (
+    <div
+      className={clsx(
+        ' border-lightGray border rounded-lg relative basis-[calc(50%_-_16px)] flex flex-col xs:max-w-none lg:basis-52 xs:basis-10/12 xs:mb-5',
+        className,
+      )}
+    >
+      <NoSSR>
+        <button
+          onClick={addToFavourites}
+          className='top-3 absolute right-3 rounded-full bg-white p-[4px]'
+        >
+          <Icon
+            path={mdiCardsHeart}
+            size={0.7}
+            color={isFavourite ? '#EB455F' : '#BFBFBF'}
+            className='relative translate-y-[0.5px] '
+          />
+        </button>
+      </NoSSR>
+      <div className='w-full px-3 py-3 rounded-lg border-t-0'>
+        <Link href={`/vacancy/${vacancy.id}`}>
+          <p className='font-semibold text-sm mb-1'>{vacancy.name}</p>
+        </Link>
+        <span className='text-gray font-normal mb-2 inline-block'>
+          {vacancy.salary_min} тг. - {vacancy.salary_max} тг.
+        </span>
+        <div className='flex flex-row items-center'></div>
+      </div>
+    </div>
+  )
 }

@@ -5,6 +5,25 @@
 
 
 export interface paths {
+  "/api/allVacancy/": {
+    get: operations["allVacancy_list"];
+  };
+  "/api/chat/": {
+    get: operations["chat_list"];
+  };
+  "/api/chat/{id}": {
+    get: operations["chat_retrieve"];
+  };
+  "/api/chat/{id}/delete/": {
+    delete: operations["chat_delete_destroy"];
+  };
+  "/api/chat/{id}/update/": {
+    put: operations["chat_update_update"];
+    patch: operations["chat_update_partial_update"];
+  };
+  "/api/chat/create/": {
+    post: operations["chat_create_create"];
+  };
   "/api/client/login/": {
     /** @description Method providing user login */
     post: operations["client_login_create"];
@@ -45,8 +64,46 @@ export interface paths {
   "/api/company/register/": {
     post: operations["company_register_create"];
   };
+  "/api/companyResponse/": {
+    get: operations["companyResponse_list"];
+  };
+  "/api/companyResponse/{id}/": {
+    delete: operations["companyResponse_destroy"];
+  };
+  "/api/like/{id}": {
+    post: operations["like_create"];
+  };
+  "/api/like/{id}/": {
+    delete: operations["like_destroy"];
+  };
+  "/api/like/list/": {
+    get: operations["like_list_list"];
+  };
   "/api/logout/": {
     post: operations["logout_create"];
+  };
+  "/api/myResponse/list/": {
+    get: operations["myResponse_list_list"];
+  };
+  "/api/occupation/": {
+    get: operations["occupation_list"];
+    post: operations["occupation_create"];
+  };
+  "/api/occupation/{id}/": {
+    get: operations["occupation_retrieve"];
+    put: operations["occupation_update"];
+    delete: operations["occupation_destroy"];
+    patch: operations["occupation_partial_update"];
+  };
+  "/api/responseAdd/{id}/": {
+    post: operations["responseAdd_create"];
+  };
+  "/api/responseByIdUpdate/{id}/": {
+    put: operations["responseByIdUpdate_update"];
+    patch: operations["responseByIdUpdate_partial_update"];
+  };
+  "/api/responseByVacancy/{id}/": {
+    get: operations["responseByVacancy_list"];
   };
   "/api/schema/": {
     /**
@@ -66,6 +123,26 @@ export interface paths {
      */
     get: operations["schema_json_retrieve"];
   };
+  "/api/skill/": {
+    get: operations["skill_list"];
+    post: operations["skill_create"];
+  };
+  "/api/skill/{id}/": {
+    get: operations["skill_retrieve"];
+    put: operations["skill_update"];
+    delete: operations["skill_destroy"];
+    patch: operations["skill_partial_update"];
+  };
+  "/api/specialization/": {
+    get: operations["specialization_list"];
+    post: operations["specialization_create"];
+  };
+  "/api/specialization/{id}/": {
+    get: operations["specialization_retrieve"];
+    put: operations["specialization_update"];
+    delete: operations["specialization_destroy"];
+    patch: operations["specialization_partial_update"];
+  };
   "/api/token/": {
     /**
      * @description Takes a set of user credentials and returns an access and refresh JSON web
@@ -80,26 +157,43 @@ export interface paths {
      */
     post: operations["token_refresh_create"];
   };
-  "/api/user/favorite/list/": {
-    get: operations["user_favorite_list_list"];
+  "/api/vacancy/": {
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    get: operations["vacancy_list"];
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    post: operations["vacancy_create"];
   };
-  "/api/vacancy/{id}": {
-    get: operations["vacancy_retrieve"];
+  "/api/vacancy/{id}/": {
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    put: operations["vacancy_update"];
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    delete: operations["vacancy_destroy"];
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    patch: operations["vacancy_partial_update"];
   };
-  "/api/vacancy/{id}/like/": {
-    post: operations["vacancy_like_create"];
+  "/api/vacancyByID/{id}": {
+    get: operations["vacancyByID_retrieve"];
   };
-  "/api/vacancy/{id}/response/": {
-    post: operations["vacancy_response_create"];
+  "/api/vacancyIDs/": {
+    get: operations["vacancyIDs_list"];
   };
-  "/api/vacancy/create/": {
-    post: operations["vacancy_create_create"];
-  };
-  "/api/vacancy/list/": {
-    get: operations["vacancy_list_list"];
-  };
-  "/api/vacancy/response/list/": {
-    get: operations["vacancy_response_list_list"];
+  "/api/vacancySearch/": {
+    get: operations["vacancySearch_list"];
   };
 }
 
@@ -107,6 +201,15 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
+    Chat: {
+      id: number;
+      messages?: (number)[];
+      participants: (string)[];
+    };
+    ChatRequest: {
+      messages?: (number)[];
+      participants: (string)[];
+    };
     City: {
       id: number;
       city?: string;
@@ -221,9 +324,16 @@ export interface components {
     LogoutRequest: {
       refresh: string;
     };
-    OccupationSerialazer: {
+    Occupation: {
       id: number;
       name: string;
+    };
+    OccupationRequest: {
+      name: string;
+    };
+    PatchedChatRequest: {
+      messages?: (number)[];
+      participants?: (string)[];
     };
     PatchedClientRequest: {
       /**
@@ -241,17 +351,77 @@ export interface components {
       company_name?: string;
       company_description?: string;
     };
+    PatchedOccupationRequest: {
+      name?: string;
+    };
+    PatchedResponsePostRequest: {
+      status?: boolean;
+    };
+    PatchedSkillCreateRequest: {
+      name?: string;
+      specialization?: number | null;
+    };
+    PatchedSpecializationRequest: {
+      name?: string;
+    };
+    PatchedVacancyCreateRequest: {
+      name?: string;
+      content?: string;
+      salary_max?: number;
+      salary_min?: number;
+      is_deleted?: boolean;
+      status?: components["schemas"]["StatusEnum"];
+      city?: number | null;
+      company?: number | null;
+      occupation?: (number)[];
+      specialization?: (number)[];
+    };
     Response: {
+      id: number;
+      vacancy: components["schemas"]["Vacancy"];
+      client: components["schemas"]["Client"];
+      response_text?: string | null;
+      /** Format: date-time */
+      date: string;
+      status?: boolean;
+    };
+    ResponseAdd: {
       id: number;
       vacancy: components["schemas"]["Vacancy"];
       client: components["schemas"]["Client"];
       /** Format: date-time */
       date: string;
+      response_text?: string | null;
+    };
+    ResponseAddRequest: {
+      response_text?: string | null;
+    };
+    ResponsePost: {
+      id: number;
+      vacancy: components["schemas"]["Vacancy"];
+      client: components["schemas"]["Client"];
+      /** Format: date-time */
+      date: string;
+      status?: boolean;
+    };
+    ResponsePostRequest: {
+      status?: boolean;
+    };
+    SkillCreate: {
+      id: number;
+      name: string;
+      specialization?: number | null;
+    };
+    SkillCreateRequest: {
+      name: string;
+      specialization?: number | null;
     };
     Specialization: {
       id: number;
       name: string;
-      skills: number;
+    };
+    SpecializationRequest: {
+      name: string;
     };
     /** @enum {boolean} */
     StatusEnum: true | false;
@@ -270,6 +440,7 @@ export interface components {
       refresh: string;
     };
     Vacancy: {
+      id: number;
       name: string;
       content: string;
       city: components["schemas"]["City"];
@@ -278,9 +449,8 @@ export interface components {
       company: components["schemas"]["Company"];
       company_name: string;
       status?: components["schemas"]["StatusEnum"];
-      occupation: components["schemas"]["OccupationSerialazer"];
+      occupation: components["schemas"]["Occupation"];
       specialization: components["schemas"]["Specialization"];
-      id: number;
     };
     VacancyCreate: {
       id: number;
@@ -292,8 +462,8 @@ export interface components {
       status?: components["schemas"]["StatusEnum"];
       city?: number | null;
       company?: number | null;
-      occupation?: number | null;
-      specialization?: number | null;
+      occupation?: (number)[];
+      specialization?: (number)[];
     };
     VacancyCreateRequest: {
       name: string;
@@ -304,8 +474,17 @@ export interface components {
       status?: components["schemas"]["StatusEnum"];
       city?: number | null;
       company?: number | null;
-      occupation?: number | null;
-      specialization?: number | null;
+      occupation?: (number)[];
+      specialization?: (number)[];
+    };
+    VacancyRequest: {
+      name: string;
+      content: string;
+      salary_min: number;
+      salary_max: number;
+      status?: components["schemas"]["StatusEnum"];
+      occupation: components["schemas"]["OccupationRequest"];
+      specialization: components["schemas"]["SpecializationRequest"];
     };
   };
   responses: never;
@@ -319,6 +498,121 @@ export type external = Record<string, never>;
 
 export interface operations {
 
+  allVacancy_list: {
+    parameters?: {
+      query?: {
+        city?: number;
+        name?: string;
+        occupation?: ("Full-Time" | "Internship" | "Part-Time" | "Remote")[];
+        salary_max?: number;
+        salary_min?: number;
+        specialization?: (string)[];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Vacancy"])[];
+        };
+      };
+    };
+  };
+  chat_list: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Chat"])[];
+        };
+      };
+    };
+  };
+  chat_retrieve: {
+    parameters: {
+        /** @description A unique integer value identifying this chat. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Chat"];
+        };
+      };
+    };
+  };
+  chat_delete_destroy: {
+    parameters: {
+        /** @description A unique integer value identifying this chat. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: never;
+    };
+  };
+  chat_update_update: {
+    parameters: {
+        /** @description A unique integer value identifying this chat. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChatRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["ChatRequest"];
+        "multipart/form-data": components["schemas"]["ChatRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Chat"];
+        };
+      };
+    };
+  };
+  chat_update_partial_update: {
+    parameters: {
+        /** @description A unique integer value identifying this chat. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedChatRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedChatRequest"];
+        "multipart/form-data": components["schemas"]["PatchedChatRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Chat"];
+        };
+      };
+    };
+  };
+  chat_create_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChatRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["ChatRequest"];
+        "multipart/form-data": components["schemas"]["ChatRequest"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["Chat"];
+        };
+      };
+    };
+  };
   client_login_create: {
     /** @description Method providing user login */
     requestBody: {
@@ -595,6 +889,58 @@ export interface operations {
       };
     };
   };
+  companyResponse_list: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Response"])[];
+        };
+      };
+    };
+  };
+  companyResponse_destroy: {
+    parameters: {
+        /** @description A unique integer value identifying this response. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: never;
+    };
+  };
+  like_create: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      200: never;
+    };
+  };
+  like_destroy: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: never;
+    };
+  };
+  like_list_list: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Favorite"])[];
+        };
+      };
+    };
+  };
   logout_create: {
     requestBody: {
       content: {
@@ -607,6 +953,188 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["Logout"];
+        };
+      };
+    };
+  };
+  myResponse_list_list: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Response"])[];
+        };
+      };
+    };
+  };
+  occupation_list: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Occupation"])[];
+        };
+      };
+    };
+  };
+  occupation_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OccupationRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["OccupationRequest"];
+        "multipart/form-data": components["schemas"]["OccupationRequest"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["Occupation"];
+        };
+      };
+    };
+  };
+  occupation_retrieve: {
+    parameters: {
+        /** @description A unique integer value identifying this occupation. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Occupation"];
+        };
+      };
+    };
+  };
+  occupation_update: {
+    parameters: {
+        /** @description A unique integer value identifying this occupation. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OccupationRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["OccupationRequest"];
+        "multipart/form-data": components["schemas"]["OccupationRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Occupation"];
+        };
+      };
+    };
+  };
+  occupation_destroy: {
+    parameters: {
+        /** @description A unique integer value identifying this occupation. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: never;
+    };
+  };
+  occupation_partial_update: {
+    parameters: {
+        /** @description A unique integer value identifying this occupation. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedOccupationRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedOccupationRequest"];
+        "multipart/form-data": components["schemas"]["PatchedOccupationRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Occupation"];
+        };
+      };
+    };
+  };
+  responseAdd_create: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ResponseAddRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["ResponseAddRequest"];
+        "multipart/form-data": components["schemas"]["ResponseAddRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["ResponseAdd"];
+        };
+      };
+    };
+  };
+  responseByIdUpdate_update: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ResponsePostRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["ResponsePostRequest"];
+        "multipart/form-data": components["schemas"]["ResponsePostRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["ResponsePost"];
+        };
+      };
+    };
+  };
+  responseByIdUpdate_partial_update: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedResponsePostRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedResponsePostRequest"];
+        "multipart/form-data": components["schemas"]["PatchedResponsePostRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["ResponsePost"];
+        };
+      };
+    };
+  };
+  responseByVacancy_list: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Response"])[];
         };
       };
     };
@@ -668,6 +1196,198 @@ export interface operations {
       };
     };
   };
+  skill_list: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["SkillCreate"])[];
+        };
+      };
+    };
+  };
+  skill_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SkillCreateRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["SkillCreateRequest"];
+        "multipart/form-data": components["schemas"]["SkillCreateRequest"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["SkillCreate"];
+        };
+      };
+    };
+  };
+  skill_retrieve: {
+    parameters: {
+        /** @description A unique integer value identifying this skill. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["SkillCreate"];
+        };
+      };
+    };
+  };
+  skill_update: {
+    parameters: {
+        /** @description A unique integer value identifying this skill. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SkillCreateRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["SkillCreateRequest"];
+        "multipart/form-data": components["schemas"]["SkillCreateRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["SkillCreate"];
+        };
+      };
+    };
+  };
+  skill_destroy: {
+    parameters: {
+        /** @description A unique integer value identifying this skill. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: never;
+    };
+  };
+  skill_partial_update: {
+    parameters: {
+        /** @description A unique integer value identifying this skill. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedSkillCreateRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedSkillCreateRequest"];
+        "multipart/form-data": components["schemas"]["PatchedSkillCreateRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["SkillCreate"];
+        };
+      };
+    };
+  };
+  specialization_list: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["Specialization"])[];
+        };
+      };
+    };
+  };
+  specialization_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SpecializationRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["SpecializationRequest"];
+        "multipart/form-data": components["schemas"]["SpecializationRequest"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["Specialization"];
+        };
+      };
+    };
+  };
+  specialization_retrieve: {
+    parameters: {
+        /** @description A unique integer value identifying this specialization. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Specialization"];
+        };
+      };
+    };
+  };
+  specialization_update: {
+    parameters: {
+        /** @description A unique integer value identifying this specialization. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SpecializationRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["SpecializationRequest"];
+        "multipart/form-data": components["schemas"]["SpecializationRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Specialization"];
+        };
+      };
+    };
+  };
+  specialization_destroy: {
+    parameters: {
+        /** @description A unique integer value identifying this specialization. */
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: never;
+    };
+  };
+  specialization_partial_update: {
+    parameters: {
+        /** @description A unique integer value identifying this specialization. */
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedSpecializationRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedSpecializationRequest"];
+        "multipart/form-data": components["schemas"]["PatchedSpecializationRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Specialization"];
+        };
+      };
+    };
+  };
   token_create: {
     /**
      * @description Takes a set of user credentials and returns an access and refresh JSON web
@@ -708,52 +1428,24 @@ export interface operations {
       };
     };
   };
-  user_favorite_list_list: {
+  vacancy_list: {
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
     responses: {
       200: {
         content: {
-          "application/json": (components["schemas"]["Favorite"])[];
+          "application/json": (components["schemas"]["VacancyCreate"])[];
         };
       };
     };
   };
-  vacancy_retrieve: {
-    parameters: {
-      path: {
-        id: number;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["Vacancy"];
-        };
-      };
-    };
-  };
-  vacancy_like_create: {
-    parameters: {
-      path: {
-        id: number;
-      };
-    };
-    responses: {
-      /** @description No response body */
-      200: never;
-    };
-  };
-  vacancy_response_create: {
-    parameters: {
-      path: {
-        id: number;
-      };
-    };
-    responses: {
-      /** @description No response body */
-      200: never;
-    };
-  };
-  vacancy_create_create: {
+  vacancy_create: {
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
     requestBody: {
       content: {
         "application/json": components["schemas"]["VacancyCreateRequest"];
@@ -769,17 +1461,86 @@ export interface operations {
       };
     };
   };
-  vacancy_list_list: {
-    parameters?: {
-      query?: {
-        city?: number;
-        name?: string;
-        occupation?: ("Full-Time" | "Internship" | "Part-Time" | "Remote")[];
-        salary_max?: number;
-        salary_min?: number;
-        specialization?: ("Gachi Gang" | "IT")[];
+  vacancy_update: {
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    parameters: {
+      path: {
+        id: string;
       };
     };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VacancyCreateRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["VacancyCreateRequest"];
+        "multipart/form-data": components["schemas"]["VacancyCreateRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["VacancyCreate"];
+        };
+      };
+    };
+  };
+  vacancy_destroy: {
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: never;
+    };
+  };
+  vacancy_partial_update: {
+    /**
+     * @description A viewset that provides default `create()` `update()`,
+     * `partial_update()`, `destroy()` and `list()` actions.
+     */
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchedVacancyCreateRequest"];
+        "application/x-www-form-urlencoded": components["schemas"]["PatchedVacancyCreateRequest"];
+        "multipart/form-data": components["schemas"]["PatchedVacancyCreateRequest"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["VacancyCreate"];
+        };
+      };
+    };
+  };
+  vacancyByID_retrieve: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["Vacancy"];
+        };
+      };
+    };
+  };
+  vacancyIDs_list: {
     responses: {
       200: {
         content: {
@@ -788,11 +1549,17 @@ export interface operations {
       };
     };
   };
-  vacancy_response_list_list: {
+  vacancySearch_list: {
+    parameters?: {
+        /** @description A search term. */
+      query?: {
+        search?: string;
+      };
+    };
     responses: {
       200: {
         content: {
-          "application/json": (components["schemas"]["Response"])[];
+          "application/json": (components["schemas"]["Vacancy"])[];
         };
       };
     };

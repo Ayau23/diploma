@@ -1,4 +1,4 @@
-import { createVacancy } from '@/API/vacancy.service'
+import { editVacancy, getVacancy } from '@/API/vacancy.service'
 import NoSSR from '@/components/Common/NoSSR'
 import { Wrapper } from '@/components/Layout/Wrapper'
 import { Button } from '@/components/UI/Button'
@@ -6,17 +6,17 @@ import { Container } from '@/components/UI/Container'
 import { Input } from '@/components/UI/Input'
 import { Layout } from '@/modules/Layout'
 import { VacancyFields } from '@/utilities/interfaces'
-import { useMutation } from '@tanstack/react-query'
+import { isJSON } from '@/utilities/utilities'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { EditorState, convertToRaw } from 'draft-js'
 import { useTranslation } from 'next-i18next'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { ReactElement, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { Tooltip } from 'react-tooltip'
 import { useUserStore } from 'store/user'
 
 const Editor = dynamic(
@@ -30,17 +30,35 @@ const Main = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<VacancyFields>()
   const { t } = useTranslation()
   const { user } = useUserStore()
-  const { push } = useRouter()
-  const { mutate } = useMutation(createVacancy)
+  const { push, query } = useRouter()
+  const { mutate } = useMutation(editVacancy)
+
+  const { data, isLoading, isError } = useQuery(
+    ['vacancy', query?.id as string],
+    () =>
+      getVacancy({
+        id: Number(query?.id),
+      }),
+  )
 
   const [editor, setEditor] = useState(EditorState.createEmpty())
+
+  useEffect(() => {
+    if (data) {
+      setValue('title', data?.name)
+      setValue('minSalary', data?.salary_min)
+      setValue('maxSalary', data?.salary_max)
+    }
+  }, [data])
 
   const onSubmit = (data: VacancyFields) => {
     mutate(
       {
+        id: Number(query?.id),
         name: data.title,
         content: JSON.stringify(convertToRaw(editor.getCurrentContent())),
         company: user?.id,
@@ -50,30 +68,27 @@ const Main = () => {
       {
         onSuccess: result => {
           push(`/vacancy/${result.id}`)
-          toast.success('Vacancy created successfully')
+          toast.success('Vacancy successfully edited')
         },
         onError: () => {
-          toast.error('Error while creating vacancy')
+          toast.error('Error while editing vacancy')
         },
       },
     )
   }
 
+  if (isLoading) return <div>Loading...</div>
+  if (isError) return <div>Error</div>
+
   return (
     <>
       <Head>
-        <title>{`${t('Add vacancy')} | GoIntern`}</title>
+        <title>{`${t('Edit vacancy')} | GoIntern`}</title>
       </Head>
       <NoSSR>
-        <Tooltip
-          noArrow
-          delayShow={200}
-          content='Сохранить на время'
-          place='bottom'
-        />
         <Wrapper>
           <Container className='justify-self-center pt-10 flex flex-col mx-auto min-h-screen'>
-            <h1 className='font-semibold text-lg'>Add vacancy</h1>
+            <h1 className='font-semibold text-lg'>Edit vacancy</h1>
             <div className='my-5 w-6/12 mx-auto'>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Input
@@ -118,11 +133,16 @@ const Main = () => {
                           'history',
                         ],
                       }}
+                      initialContentState={
+                        data?.content && isJSON(data?.content)
+                          ? JSON.parse(data?.content)
+                          : data?.content ?? ''
+                      }
                       onEditorStateChange={state => setEditor(state)}
                     />
                   </NoSSR>
                 </div>
-                <Button className='mt-2'>Create</Button>
+                <Button className='mt-2'>Edit</Button>
               </form>
             </div>
           </Container>

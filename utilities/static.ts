@@ -26,7 +26,7 @@ export const clientTopNavbar: Navbar[] = [
 	{
 		id: 3,
 		href: '/client/responses',
-		label: 'booking',
+		label: 'responses',
 		icon: mdiBook,
 	},
 	{

@@ -1,24 +1,19 @@
-import { getVacancies } from '@/API/vacancy.service'
+import { getMyResponses } from '@/API/response'
 import { Wrapper } from '@/components/Layout/Wrapper'
 import { Container } from '@/components/UI/Container'
-import { Cards } from '@/modules/Cards'
+import { Cards } from '@/modules/Client/Cards'
 import { Layout } from '@/modules/Layout'
-import { Search } from '@/modules/Search'
 import { useQuery } from '@tanstack/react-query'
-import { useTranslation } from 'next-i18next'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
+import { useUserStore } from 'store/user'
 
 const Main = () => {
-  const { t } = useTranslation()
-  const { locale } = useRouter()
-
-  const {
-    data: vacancies,
-    isLoading,
-    isError,
-  } = useQuery(['vacancies'], () => getVacancies())
+  const { user } = useUserStore()
+  const { data, isLoading, isError } = useQuery(
+    ['my', 'responses', user?.id],
+    getMyResponses,
+  )
 
   if (isLoading) return <>Loading...</>
   if (isError) return <>Error!</>
@@ -26,12 +21,17 @@ const Main = () => {
   return (
     <>
       <Head>
-        <title>GoIntern | Main</title>
+        <title>GoIntern | Profile</title>
       </Head>
       <Wrapper>
         <Container className='pt-10 pb-24 mx-auto xs:pt-0'>
-          <Search />
-          <Cards title={t('Vacancies')} vacancies={vacancies} />
+          {data.length ? (
+            <Cards responses={data} />
+          ) : (
+            <span className='font-medium inline-block mt-8 ml-2'>
+              No responses was found
+            </span>
+          )}
         </Container>
       </Wrapper>
     </>
